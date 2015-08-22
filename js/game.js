@@ -39,8 +39,8 @@ BasicGame.Boot.prototype =
         tile.selected = true;
         tile.tint = 0x86bfda;
 
-        testx = tile.isoX/30;
-        testy = tile.isoY/30;
+        testx = tile.isoX/18;
+        testy = tile.isoY/18;
 
 
       }
