@@ -184,7 +184,7 @@ BasicGame.Boot.prototype =
           game.physics.isoArcade.enable(object);
           //object.body.collideWorldBounds = true;
           object.body.immovable = true;
-          console.log(game.physics.isoArcade.distanceBetween(object, player));
+          //console.log(game.physics.isoArcade.distanceBetween(object, player));
         }
       }
     }
