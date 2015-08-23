@@ -14,7 +14,7 @@ function gameImage(imageName, path, tileHeight){
   this.path = path;
   this.tileHeight = tileHeight;
 }
-  
+
 var images = [];
 
 //Add new images manually..
@@ -30,6 +30,7 @@ BasicGame.Boot.prototype =
 {
   preload: function () {
     game.load.image('player', 'assets/pvakt.png');
+    game.load.image('car', 'assets/carFirst.png');
 
     //Magic hurrdurr
     for(var i = 0; i < images.length; i++){
@@ -47,10 +48,46 @@ BasicGame.Boot.prototype =
   },
   create: function () {
     isoGroup = game.add.group();
+    carGroup = game.add.group();
 
-    this.spawnTiles(1);
+    level_1_Map = [
+      [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
+      [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
+      [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
+      [1,1,1,1,1,1,1,2,3,1,0,0,0,0],
+      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
+      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
+      [1,4,4,4,4,4,6,2,3,1,0,0,0,0],
+      [1,4,4,4,4,4,5,2,3,1,0,0,0,0],
+      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
+      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
+      [1,1,1,1,1,1,1,2,3,1,0,0,0,0],
+      [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
+      [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
+      [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
+    ];
+    level_1_Cars = [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
 
-    player = game.add.isoSprite(32, 32, 0, 'player', 0, isoGroup);
+
+    this.spawnTiles(level_1_Map);
+    this.spawnCars(level_1_Cars);
+
+    player = game.add.isoSprite(32, 32, 0, 'player', 0, carGroup);
     player.anchor.set(0.5);
     game.physics.isoArcade.enable(player);
     player.body.collideWorldBounds = true;
@@ -78,8 +115,8 @@ BasicGame.Boot.prototype =
         tile.selected = true;
         tile.tint = 0x86bfda;
 
-        testx = tile.isoX/35;
-        testy = tile.isoY/35;
+        testx = tile.isoX/33.54101966249684;
+        testy = tile.isoY/33.54101966249684;
       } else if (tile.selected && !inBounds) {
         tile.selected = false;
         tile.tint = 0xffffff;
@@ -104,46 +141,54 @@ BasicGame.Boot.prototype =
     }
 
 
+    /*for(var i = 0; i < objects.length; i++) {
+      game.physics.arcade.collide(i, player);
+
+    }*/
+    game.physics.isoArcade.collide(carGroup);
+    game.iso.simpleSort(carGroup);
   },
   render: function () {
     //Debug stuff
     game.debug.text('X: '+ testx + ' Y: ' + testy, 2, 36, "#000");
     game.debug.text('FPS: '+ game.time.fps || '--', 2, 14, "#000");
-  },
-  spawnTiles: function (level) {
-    tilesMap = [
-      [0,0,0,0,0,0,1,2,3,1,0,0,0,0,],
-      [0,0,0,0,0,0,1,2,3,1,0,0,0,0,],
-      [0,0,0,0,0,0,1,2,3,1,0,0,0,0,],
-      [1,1,1,1,1,1,1,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,6,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,5,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
-      [1,1,1,1,1,1,1,2,3,1,0,0,0,0],
-      [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
-      [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
-      [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
-    ];
+    //game.debug.bodyInfo(objects[0], 16, 24);
 
+    //game.debug.body(player);
+  },
+  spawnTiles: function(tilesMap) {
     var tile;
     for (var x = 0; x < tilesMap.length; x++) {
-      for (var y = 0; y < tilesMap[x].length; y++) { 
+      for (var y = 0; y < tilesMap[x].length; y++) {
         var imgObject = images[tilesMap[x][y]];
         var imgName = imgObject.imageName;
         var img = game.cache.getImage(imgName);
         var calcX = img.width - 2;
         var calcY = img.height - imgObject.tileHeight;
-        
+
         var xx = calcX / (2 * Math.cos(this.game.iso.projectionAngle))
        + calcY / (2 * Math.sin(this.game.iso.projectionAngle));
         var size = xx/2;
         tile = game.add.isoSprite(y * size, x * size, 0, imgName, 0, isoGroup);
         tile.anchor.set(0.5, 0);
-      }  
+      }
     }
+  },
+  spawnCars: function(carsMap) {
+    var object;
+    for (var x = 0; x < carsMap.length; x++) {
+      for (var y = 0; y < carsMap[x].length; y++) {
+        if (carsMap[x][y] == 1) {
+          object = game.add.isoSprite(x * 33.54101966249684, y * 33.54101966249684, 10, 'car', 0, carGroup);
+          object.anchor.set(0.5, 0);
+          game.physics.isoArcade.enable(object);
+          //object.body.collideWorldBounds = true;
+          object.body.immovable = true;
+          console.log(game.physics.isoArcade.distanceBetween(object, player));
+        }
+      }
+    }
+
   }
 }
 
