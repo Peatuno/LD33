@@ -7,6 +7,7 @@ BasicGame.Boot = function (game) { };
 var isoGroup, player, cursorPos, cursor;
 
 var testx = 0, testy = 0;
+var interactKey;
 
 //Class gameImage
 function gameImage(imageName, path, tileHeight){
@@ -16,6 +17,7 @@ function gameImage(imageName, path, tileHeight){
 }
 
 var images = [];
+var objects = [];
 
 //Add new images manually..
 images.push(new gameImage("tile", "assets/grass.gif", 5));
@@ -102,6 +104,7 @@ BasicGame.Boot.prototype =
         Phaser.Keyboard.DOWN,
         Phaser.Keyboard.SPACEBAR
     ]);
+    interactKey = game.input.keyboard.addKey(Phaser.Keyboard.E);
 
     cursorPos = new Phaser.Plugin.Isometric.Point3();
   },
@@ -125,6 +128,8 @@ BasicGame.Boot.prototype =
 
     // Move the player at this speed.
     var speed = 100;
+
+
     if (this.cursors.up.isDown) {
       player.body.velocity.y = -speed;
     } else if (this.cursors.down.isDown) {
@@ -140,18 +145,45 @@ BasicGame.Boot.prototype =
         player.body.velocity.x = 0;
     }
 
+    var neartocar;
+    for(var i = 0; i < objects.length; i++) {
+      if (game.physics.isoArcade.distanceBetween(objects[i], player) < 34) {
+        //console.log(objects[i]._isoPosition.x);
+        if (typeof text == 'undefined') {
+          text = game.add.text(player.x, player.y-50, "[E]");
+          text.anchor.set(0.5, 0);
+        } else {
+          text.x = player.x;
+          text.y = player.y-50;
+        }
+        neartocar = objects[i];
+      } else {
+        if (typeof text != 'undefined') {
+          game.world.remove(text);
+          text = undefined;
+        }
+      }
+    }
+    if (interactKey.isDown) {
+      if (neartocar != null) {
+        if (game.physics.isoArcade.distanceBetween(neartocar, player) < 34) {
+          console.log("hej");
+          
+          neartocar.tint = 0x333333;
+        }
+      }
 
-    /*for(var i = 0; i < objects.length; i++) {
-      game.physics.arcade.collide(i, player);
+    }
 
-    }*/
+
+    //Collide stuff
     game.physics.isoArcade.collide(carGroup);
     game.iso.simpleSort(carGroup);
   },
   render: function () {
     //Debug stuff
-    game.debug.text('X: '+ testx + ' Y: ' + testy, 2, 36, "#000");
-    game.debug.text('FPS: '+ game.time.fps || '--', 2, 14, "#000");
+    game.debug.text('X: '+ testx + ' Y: ' + testy, 2, 36, "#fff");
+    game.debug.text('FPS: '+ game.time.fps || '--', 2, 14, "#fff");
     //game.debug.bodyInfo(objects[0], 16, 24);
 
     //game.debug.body(player);
@@ -184,7 +216,7 @@ BasicGame.Boot.prototype =
           game.physics.isoArcade.enable(object);
           //object.body.collideWorldBounds = true;
           object.body.immovable = true;
-          //console.log(game.physics.isoArcade.distanceBetween(object, player));
+          objects.push(object);
         }
       }
     }
