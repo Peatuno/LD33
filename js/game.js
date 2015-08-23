@@ -25,6 +25,7 @@ images.push(new gameImage("road_right_0", "assets/road_right_0.gif", 5));
 images.push(new gameImage("road", "assets/road.gif", 5));
 images.push(new gameImage("road_down_1", "assets/road_down_1.gif", 5));
 images.push(new gameImage("road_up_1", "assets/road_up_1.gif", 5));
+images.push(new gameImage("proad", "assets/proad.gif", 5));
 
 BasicGame.Boot.prototype =
 {
@@ -87,7 +88,8 @@ BasicGame.Boot.prototype =
     });
 
     // Move the player at this speed.
-    var speed = 100;
+    var speed = 100;//, dividedSpeed = 50;
+
     if (this.cursors.up.isDown) {
       player.body.velocity.y = -speed;
     } else if (this.cursors.down.isDown) {
@@ -116,12 +118,12 @@ BasicGame.Boot.prototype =
       [0,0,0,0,0,0,1,2,3,1,0,0,0,0,],
       [0,0,0,0,0,0,1,2,3,1,0,0,0,0,],
       [1,1,1,1,1,1,1,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
+      [1,7,7,7,7,7,1,2,3,1,0,0,0,0],
       [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
       [1,4,4,4,4,4,6,2,3,1,0,0,0,0],
       [1,4,4,4,4,4,5,2,3,1,0,0,0,0],
       [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
+      [1,7,7,7,7,7,1,2,3,1,0,0,0,0],
       [1,1,1,1,1,1,1,2,3,1,0,0,0,0],
       [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
       [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
