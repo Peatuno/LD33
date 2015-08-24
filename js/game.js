@@ -4,7 +4,7 @@ var BasicGame = function (game) { };
 
 BasicGame.Boot = function (game) { };
 
-var isoGroup, player, cursorPos, cursor;
+var isoGroup, player, cursorPos, cursor, skrivskiva;
 
 var testx = 0, testy = 0;
 var interactKey;
@@ -16,8 +16,87 @@ function gameImage(imageName, path, tileHeight){
   this.tileHeight = tileHeight;
 }
 
+function car(imageName, dir1, dir2, dir3, dir4, x, y, faults){
+  this.imageName = imageName;
+  this.dirs = [dir1, dir2, dir3, dir4];
+}
+
+function gameCar(index, x, y, faults, offsetX, offsetY, offsetZ){
+  this.index = index;
+  this.x = x;
+  this.y = y;
+  this.faults = faults;
+
+  if(offsetX != null){
+    this.offsetX = offsetX;
+  } else {
+    this.offsetX = 0;
+  }
+
+  if(offsetY != null){
+    this.offsetY = offsetY;
+  } else {
+    this.offsetY = 0;
+  }
+
+  if(offsetZ != null){
+    this.offsetZ = offsetZ;
+  } else {
+    this.offsetZ = 0;
+  }
+
+  this.registredFaults = [];
+  this.object = null;
+}
+
+gameCar.prototype.validErrorsFound(){
+  var valid = 0;
+  for(var i = 0; i < this.registredFaults.length; i++){
+    var f = registredFaults[i];
+    for(var j = 0; j < this.faults.length; j++){
+      if(f.indexOf(faults[j]) > -1){
+        valid += 1;
+      }
+    }
+  }
+  return valid;
+}
+
+function findGameCar(object){
+  for(var i = 0; i < gameCars.length; i++){
+    var car = gameCars[i];
+    if(object == car.object){
+      return car;
+    }
+  }
+  return null;
+}
+
+
+
+function totalFaults(){
+  var c = 0;
+  for(var i = 0; i < gameCars.length; i++){
+    c += gameCars[i].faults.length;
+  }
+
+  return c;
+}
+
+function faultsCaught(){
+  var found = 0;
+  for(var i = 0; i < gameCars.length; i++){
+    found += gameCars[i].validErrorsFound();
+  }
+
+  return found;
+}
+
 var images = [];
 var objects = [];
+var cars = [];
+var carIndex = [null];
+var gameCars = [];
 
 //Add new images manually..
 images.push(new gameImage("tile", "assets/grass.gif", 5));
@@ -29,16 +108,32 @@ images.push(new gameImage("road_down_1", "assets/road_down_1.gif", 5));
 images.push(new gameImage("road_up_1", "assets/road_up_1.gif", 5));
 images.push(new gameImage("proad", "assets/proad.gif", 5));
 
+cars.push(new car("blue", "assets/blue0.gif", "assets/blue1.gif", "assets/blue2.gif", "assets/blue3.gif"));
+gameCars.push(new gameCar(1, 5, 4, ["Out-of-bounds"], 0, 0, 0));
+gameCars.push(new gameCar(3, 4, 4, ["Out-of-bounds"], 0, 0, 0));
+
+
 BasicGame.Boot.prototype =
 {
   preload: function () {
     game.load.image('player', 'assets/pvakt.png');
     game.load.image('car', 'assets/carFirst.png');
+    game.load.image("ss", "assets/skrivskiva.png");
 
     //Magic hurrdurr
     for(var i = 0; i < images.length; i++){
       var image = images[i];
       game.load.image(image.imageName, image.path);
+    }
+
+    //cars hurrdurr
+    for(var j = 0; j < cars.length; j++){
+      var car = cars[j];
+    
+      for(var k = 0; k < 4; k++){
+        game.load.image(car.imageName + k, car.dirs[k]);
+        carIndex.push(car.imageName + k);
+      }
     }
 
     game.time.advancedTiming = true;
@@ -58,12 +153,12 @@ BasicGame.Boot.prototype =
       [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
       [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
       [1,1,1,1,1,1,1,2,3,1,0,0,0,0],
-      [1,7,7,7,7,7,1,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,6,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,5,2,3,1,0,0,0,0],
-      [1,4,4,4,4,4,1,2,3,1,0,0,0,0],
-      [1,7,7,7,7,7,1,2,3,1,0,0,0,0],
+      [1,7,7,7,7,7,1,2,3,1,1,1,1,1],
+      [1,4,4,4,4,4,1,2,3,1,2,2,7,1],
+      [1,4,4,4,4,4,6,2,3,6,2,2,7,1],
+      [1,4,4,4,4,4,5,2,3,5,2,2,7,1],
+      [1,4,4,4,4,4,1,2,3,1,2,2,7,1],
+      [1,7,7,7,7,7,1,2,3,1,1,1,1,1],
       [1,1,1,1,1,1,1,2,3,1,0,0,0,0],
       [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
       [0,0,0,0,0,0,1,2,3,1,0,0,0,0],
@@ -73,16 +168,16 @@ BasicGame.Boot.prototype =
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,1,0,1,1,0,0,0,0,0,0,0,0,0],
-      [0,1,0,1,1,0,0,0,0,0,0,0,0,0],
-      [0,1,0,1,1,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,3,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,0,0,0,0,0,0],
+      [0,0,0,0,0,0,2,2,4,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     ];
 
@@ -92,6 +187,11 @@ BasicGame.Boot.prototype =
 
     player = game.add.isoSprite(32, 32, 0, 'player', 0, carGroup);
     player.anchor.set(0.5);
+
+    skrivskiva = game.add.image(80, 80, "ss");
+    skrivskiva.anchor.set(0);
+    skrivskiva.visible = false;
+
     game.physics.isoArcade.enable(player);
     player.body.collideWorldBounds = true;
 
@@ -165,17 +265,22 @@ BasicGame.Boot.prototype =
         }
       }
     }
-    if (interactKey.isDown) {
+    if (interactKey.isDown && !skrivskiva.visible) {
       if (neartocar != null) {
         if (game.physics.isoArcade.distanceBetween(neartocar, player) < 34) {
           console.log("hej");
-          
+          var car = findGameCar(neartocar);
+          console.log(car.faults);
+          //hurrdurr registrera fel..
+          skrivskiva.visible = true;
           neartocar.tint = 0x333333;
         }
       }
-
     }
 
+    if(neartocar == null){
+      skrivskiva.visible = false;
+    }
 
     //Collide stuff
     game.physics.isoArcade.collide(carGroup);
@@ -209,19 +314,22 @@ BasicGame.Boot.prototype =
   },
   spawnCars: function(carsMap) {
     var object;
-    for (var x = 0; x < carsMap.length; x++) {
-      for (var y = 0; y < carsMap[x].length; y++) {
-        if (carsMap[x][y] == 1) {
-          object = game.add.isoSprite(x * 33.54101966249684, y * 33.54101966249684, 10, 'car', 0, carGroup);
-          object.anchor.set(0.5, 0);
-          game.physics.isoArcade.enable(object);
-          //object.body.collideWorldBounds = true;
-          object.body.immovable = true;
-          objects.push(object);
-        }
+    for(var i = 0; i < gameCars.length; i++){
+      var gc = gameCars[i];
+      var carName = carIndex[gc.index];
+      var padding = 9;
+      if(carName.indexOf("2") > -1 || carName.indexOf("3") > -1){ 
+        padding = 5;
       }
-    }
+      object = game.add.isoSprite((gc.x + gc.offsetX) * 33.54101966249684, (gc.y + gc.offsetY) * 33.54101966249684, padding + gc.offsetZ, carName, 0, carGroup);
+      object.anchor.set(0.5, 0);
+      game.physics.isoArcade.enable(object);
+      //object.body.collideWorldBounds = true;
+      object.body.immovable = true;
+      objects.push(object);
 
+      gc.object = object;
+    }
   }
 }
 
