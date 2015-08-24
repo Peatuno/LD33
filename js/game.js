@@ -49,7 +49,7 @@ function gameCar(index, x, y, faults, offsetX, offsetY, offsetZ){
   this.object = null;
 }
 
-gameCar.prototype.validErrorsFound(){
+gameCar.prototype.validErrorsFound = function(){
   var valid = 0;
   for(var i = 0; i < this.registredFaults.length; i++){
     var f = registredFaults[i];
