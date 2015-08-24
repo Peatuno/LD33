@@ -229,6 +229,18 @@ BasicGame.Boot.prototype =
 
     // Move the player at this speed.
     var speed = 100;
+    var cursors = [this.cursors.up, this.cursors.down, this.cursors.left, this.cursors.right];
+    var cursorsDown = 0;
+
+    for(var i = 0; i < cursors.length; i++){
+      if(cursors[i].isDown){
+        cursorsDown += 1;
+      }
+    }
+
+    if(cursorsDown > 1){
+      speed = 50*Math.sqrt(2);
+    }
 
 
     if (this.cursors.up.isDown) {
